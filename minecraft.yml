@@ -1,0 +1,61 @@
+---
+- hosts: security_group_minecraft_sg
+  become: yes
+  tasks:
+
+  - name: Upgrade all packages to latest
+    yum: update_cache=yes name=* state=latest
+
+  # - name: Install dependencies
+  #   yum: name=screen state=latest
+  #   with_items:
+  #     - screen
+
+  - name: Create minecraft user
+    user:
+      name: minecraft
+      system: yes
+
+  - name: Copy in minecraft init.d script
+    become_user: minecraft
+    copy:
+      src: "./files/minecraft-init"
+      dest: "~"
+
+  - name: Chmod init script
+    become_user: minecraft
+    file:
+      mode: 0755
+      path: ~/minecraft-init/minecraft
+
+  - name: Create working dirs
+    become_user: minecraft
+    file:
+      state: directory
+      path: "~/minecraft/{{item}}"
+    with_items:
+      - worlds
+      - mcbackup
+      - mcbackup/worlds
+      - mcbackup/server
+
+  - name: Download minecraft server jar from {{server_jar_url}}
+    become_user: minecraft
+    get_url:
+      url: "{{server_jar_url}}"
+      dest: ~/minecraft/minecraft-server.jar
+
+  - name: Agree to minecraft EULA
+    become_user: minecraft
+    copy:
+      content: "eula=true"
+      dest: ~/minecraft/eula.txt
+
+  - name: Create init.d file link
+    file:
+      src: /home/minecraft/minecraft-init/minecraft
+      dest: /etc/init.d/minecraft
+      state: link
+
+  - name: Start it up
+    service: name=minecraft enabled=yes state=started

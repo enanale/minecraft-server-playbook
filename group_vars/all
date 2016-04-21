@@ -1,0 +1,8 @@
+---
+# Variables here are applicable to all host groups
+
+# make sure these are compatible versions
+# server_jar_url: "https://s3.amazonaws.com/Minecraft.Download/versions/1.9.2/minecraft_server.1.9.2.jar" 
+server_jar_url: "https://s3.amazonaws.com/Minecraft.Download/versions/1.9/minecraft_server.1.9.jar" 
+
+#forge_jar_url: "http://files.minecraftforge.net/maven/net/minecraftforge/forge/1.8-11.14.4.1563/forge-1.8-11.14.4.1563-universal.jar"
